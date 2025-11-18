@@ -34,6 +34,11 @@ class GroundedSAM:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.factor_to_detect_abnormal_large_masks = factor_to_detect_abnormal_large_masks
 
+        self.erosion_thickness = erosion_thickness
+        self.refinement_thickness = refinement_thickness
+        self.nms_iou_threshold = nms_iou_threshold
+
+
         self.groundingdino_model = None
         self.sam_predictor = None
 
@@ -262,7 +267,7 @@ class GroundedSAM:
 
     def polish_masks(self, masks):
         def clean_mask(mask):
-            kernel = np.ones((3, 3), np.uint8)
+            kernel = np.ones((self.refinement_thickness, self.refinement_thickness), np.uint8)
             cleaned_mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
             cleaned_mask = cv2.morphologyEx(
                 cleaned_mask, cv2.MORPH_OPEN, kernel, iterations=1
@@ -355,7 +360,7 @@ class GroundedSAM:
 
     def suppress_redundant_masks(self, bboxes, scores, masks):
         filtered_bboxes, filtered_scores, filtered_masks, filtered_indices = self.filter_bboxes(bboxes, scores, masks)
-        keep_indices = self.nms_masks(filtered_masks, filtered_scores)
+        keep_indices = self.nms_masks(filtered_masks, filtered_scores, self.nms_iou_threshold)
         final_masks = filtered_masks[keep_indices]
         final_masks = self.rectify_intersection(final_masks)
         nms_indices = np.array(filtered_indices)[keep_indices]
@@ -389,7 +394,7 @@ class GroundedSAM:
         return flat_masks.reshape(m, 1, height, width)
 
     def erode_masks(self, masks):
-        kernel = np.ones((2, 2), np.uint8)
+        kernel = np.ones((self.erosion_thickness, self.erosion_thickness), np.uint8)
         eroded_masks = np.zeros_like(masks, dtype=np.uint8)  # Specify dtype here
         for i in range(masks.shape[0]):
             eroded_masks[i] = cv2.erode(masks[i].astype(np.uint8), kernel)  # Convert to uint8

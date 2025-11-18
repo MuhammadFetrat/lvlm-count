@@ -1,0 +1,9 @@
+--mask_detection_box_threshold=0.1
+--mask_detection_text_threshold=0.1
+--area_detection_box_threshold=0.1
+--area_detection_text_threshold=0.1
+--erosion_thickness = 2
+--refinement_thickness = 3
+--nms_iou_threshold = 0.4
+--number_of_vertical_divides=-1
+--number_of_horizontal_divides=0

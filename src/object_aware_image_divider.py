@@ -30,6 +30,9 @@ class ObjectAwareImageDivider:
         area_detection_box_threshold,
         area_detection_text_threshold,
         area_detection_iou_threshold,
+        nms_iou_threshold = 0.4,
+        erosion_thickness = 2, 
+        refinement_thickness = 3,
         use_sam_masks=False,
         factor_to_detect_abnormal_large_masks=25,
         device=None
@@ -61,7 +64,11 @@ class ObjectAwareImageDivider:
             config_file=self.GROUDING_DINO_CONFIG_FILE,
             ckpt_filename=self.GROUNDING_DINO_CHECKPOINT_FILE,
             sam_checkpoint=self.SAM_CHECKPOINT_FILE,
-            factor_to_detect_abnormal_large_masks=factor_to_detect_abnormal_large_masks
+            factor_to_detect_abnormal_large_masks=factor_to_detect_abnormal_large_masks,
+            nms_iou_threshold = nms_iou_threshold,
+            erosion_thickness = erosion_thickness,
+            refinement_thickness = refinement_thickness
+
         )
 
         self.sam_masks = None

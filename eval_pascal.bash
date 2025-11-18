@@ -1,10 +1,4 @@
 python3 eval_pascal.py \
     --dataset_path data/PASCAL/pascal.csv \
     --image_base_path data/PASCAL/VOCdevkit/VOC2007/JPEGImages \
-    --mask_detection_box_threshold 0.1 \
-    --mask_detection_text_threshold 0.1 \
-    --mask_detection_iou_threshold 0.8 \
-    --area_detection_box_threshold 0.1 \
-    --area_detection_text_threshold 0.1 \
-    --area_detection_iou_threshold 0.8 \
-    --number_of_vertical_divides -1
+    @eval_config.txt

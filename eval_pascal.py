@@ -26,9 +26,13 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_BASE_URL = "https://api.openai.com/v1"
 WORKING_DIRECTORY_BASE_NAME = f"tmp_pascal_{datetime.now().strftime('%d.%m.%Y-%H:%M:%S')}"
 
-parser = argparse.ArgumentParser(description='LVLM-COUNT: Enhancing the Counting Ability of Large Vision-Language Models. FSC-147 evaluation script.')
-parser.add_argument('--dataset_path', type=str, default="", required=False)
-parser.add_argument('--image_base_path', type=str, default="", required=False)
+parser = argparse.ArgumentParser(
+    description='LVLM-COUNT: Enhancing the Counting Ability of Large Vision-Language Models. Emoji-Bench evaluation script.',
+    fromfile_prefix_chars='@'  # <-- ADDED THIS
+)
+
+parser.add_argument('--dataset_path', type=str, default="data/PASCAL/pascal.csv", required=False)
+parser.add_argument('--image_base_path', type=str, default="data/PASCAL/VOCdevkit/VOC2007/JPEGImages", required=False)
 parser.add_argument('--model_name', type=str, default="gpt-4o-2024-08-06", required=False)
 parser.add_argument('--model_max_tokens', type=int, default=256, required=False)
 parser.add_argument('--model_temperature', type=float, default=1.0, required=False)
@@ -45,6 +49,11 @@ parser.add_argument('--number_of_vertical_divides', type=int, default=-1, requir
 parser.add_argument('--number_of_horizontal_divides', type=int, default=0, required=False)
 parser.add_argument('--equivalent_size_division', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('--super_resolution', default=False, action=argparse.BooleanOptionalAction)
+
+parser.add_argument('--nms_iou_threshold', type=float, default=0.4, required=False)
+parser.add_argument('--erosion_thickness', type=int, default=2, required=False)
+parser.add_argument('--refinement_thickness',type=int, default=3, required=False)
+
 args = parser.parse_args()
 
 LLM = OpenAI(
@@ -302,6 +311,9 @@ def method_wrapper(question, object_of_interest, image_path, working_dirname):
         area_detection_text_threshold=args.area_detection_text_threshold,
         area_detection_iou_threshold=args.area_detection_iou_threshold,
         superRes=args.super_resolution,
+        nms_iou_threshold = args.nms_iou_threshold,
+        erosion_thickness = args.erosion_thickness,
+        refinement_thickness = args.refinement_thickness,
         use_sam_masks=False
     )
 
